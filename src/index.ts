@@ -1,4 +1,5 @@
 import puppeteer from "puppeteer";
+import type { Browser } from "puppeteer";
 import express from "express";
 import cors from "cors";
 import z from "zod";
@@ -14,17 +15,26 @@ const loginSchema = z.object({
   senha: z.string().min(6).max(255),
 });
 
-app.post("/siga/api/v1", (req, res) => {
+app.post("/siga/api/v1", async (req, res) => {
   try {
     const { login, senha } = loginSchema.parse(req.body);
 
-    fazerLogin(login, senha)
+    const browser = await puppeteer.launch({
+      // executablePath: "/usr/bin/chromium-browser",
+      headless: false,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+
+    fazerLogin(login, senha, browser)
       .then((usuario) => {
         res.send(usuario);
       })
       .catch((err) => {
         res.send("Ocorreu um erro, verifique o login e a senha!");
         console.log(err);
+      })
+      .finally(() => {
+        browser.close();
       });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -37,12 +47,7 @@ app.listen(3333, () => {
   console.log(`Servidor iniciado na porta 3333`);
 });
 
-async function fazerLogin(login: string, senha: string) {
-  const browser = await puppeteer.launch({
-    // executablePath: "/usr/bin/chromium-browser",
-    headless: false,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  });
+async function fazerLogin(login: string, senha: string, browser: Browser) {
   const page = await browser.newPage();
 
   await page.goto("https://siga.cps.sp.gov.br/aluno/login.aspx");
