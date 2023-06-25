@@ -19,7 +19,7 @@ app.post("/siga/api/v1", async (req, res) => {
   try {
     const { login, senha } = loginSchema.parse(req.body);
 
-    console.log("opening the browser")
+    console.log("opening the browser");
     const browser = await puppeteer.launch({
       // executablePath: "/usr/bin/chromium-browser",
       headless: false,
@@ -53,6 +53,15 @@ async function fazerLogin(login: string, senha: string, browser: Browser) {
   const page = await browser.newPage();
 
   await page.goto("https://siga.cps.sp.gov.br/aluno/login.aspx");
+
+  //wait for 1 second
+  await page.waitForFunction(() => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(resolve);
+      }, 1000); // 1000 milliseconds = 1 second
+    });
+  });
 
   await page.waitForSelector("#vSIS_USUARIOID", { timeout: 18500 });
   await page.waitForSelector("#vSIS_USUARIOSENHA", { timeout: 18500 });
