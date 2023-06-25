@@ -19,6 +19,7 @@ app.post("/siga/api/v1", async (req, res) => {
   try {
     const { login, senha } = loginSchema.parse(req.body);
 
+    console.log("opening the browser")
     const browser = await puppeteer.launch({
       // executablePath: "/usr/bin/chromium-browser",
       headless: false,
@@ -34,6 +35,7 @@ app.post("/siga/api/v1", async (req, res) => {
         console.log(err);
       })
       .finally(() => {
+        console.log("closing the browser");
         browser.close();
       });
   } catch (error) {
