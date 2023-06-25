@@ -1,4 +1,6 @@
 ## About
+IT IS NOT AN OFFICIAL API OF THE PORTAL. DEVELOPED BY A STUDENT
+
 
 - Project developed to facilitate access to information on the SIGA student portal
 - Back-end developed in NodeJS with JavaScript programming language
