@@ -21,7 +21,7 @@ app.post("/siga/api/v1", async (req, res) => {
 
     console.log("opening the browser");
     const browser = await puppeteer.launch({
-      // executablePath: "/usr/bin/chromium-browser",
+      // executablePath: "/usr/bin/chromium-browser", // Isso é para rodar em um servidor, ele irá usar o chromium-browser
       headless: false,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
@@ -45,8 +45,8 @@ app.post("/siga/api/v1", async (req, res) => {
   }
 });
 
-app.listen(3333, () => {
-  console.log(`Servidor iniciado na porta 3333`);
+app.listen(9091, () => {
+  console.log(`Servidor iniciado na porta 9091`);
 });
 
 async function fazerLogin(login: string, senha: string, browser: Browser) {
@@ -54,12 +54,11 @@ async function fazerLogin(login: string, senha: string, browser: Browser) {
 
   await page.goto("https://siga.cps.sp.gov.br/aluno/login.aspx");
 
-  //wait for 1 second
   await page.waitForFunction(() => {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve(resolve);
-      }, 1000); // 1000 milliseconds = 1 second
+      }, 1000);
     });
   });
 
@@ -152,9 +151,13 @@ async function fazerLogin(login: string, senha: string, browser: Browser) {
 
   await page.goto("https://siga.cps.sp.gov.br/aluno/faltasparciais.aspx");
 
+  await page.waitForSelector('#Grid1ContainerTbl');
+
+  const count = await page.$$eval('#Grid1ContainerTbl .GridClearOdd', elements => elements.length);
+
   const faltasAluno = [];
 
-  for (let i = 1; i <= 7; i++) {
+  for (let i = 1; i <= count; i++) {
     const nomeDisciplina = await page.$eval(
       `#span_vACD_DISCIPLINANOME_000${i}`,
       (element) => element.textContent?.trim()
